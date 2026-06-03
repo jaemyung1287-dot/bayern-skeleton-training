@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skeleton Team Bayern</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f9f8f6;
+  --surface: #ffffff;
+  --border: #e8e6e1;
+  --text-primary: #1a1916;
+  --text-secondary: #7a7670;
+  --text-muted: #b0ada6;
+  --accent: #2b2b28;
+  --green: #3a8a00;
+  --green-bg: #f0fde8;
+  --tag-warmup-bg: #eef4ff; --tag-warmup: #2563c4;
+  --tag-main-bg: #fff4e6;   --tag-main: #c45a00;
+  --tag-core-bg: #f0fde8;   --tag-core: #3a8a00;
+  --yt-red: #e03030;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-primary);
+  max-width: 640px;
+  margin: 0 auto;
+  padding-bottom: 60px;
+}
+
+/* ─── HOME ───────────────────────────── */
+.home-header {
+  padding: 32px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.home-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.home-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* Filter */
+.filter-bar {
+  display: flex;
+  gap: 6px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.filter-pill.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Session list */
+.sessions-list { padding: 20px 20px 0; }
+.date-group { margin-bottom: 24px; }
+.date-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.date-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.date-line { flex: 1; height: 1px; background: var(--border); }
+
+.session-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  gap: 12px;
+  transition: box-shadow 0.18s ease;
+}
+.session-card.clickable { cursor: pointer; }
+.session-card.clickable:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+.session-card.dim { opacity: 0.45; pointer-events: none; }
+.session-card.past { opacity: 0.72; }
+
+.time-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+.time-vm { background: #eef4ff; color: #2563c4; }
+.time-nm { background: #fff4e6; color: #c45a00; }
+
+.session-info { flex: 1; min-width: 0; }
+.s-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 1px;
+}
+.s-sub { font-size: 11px; color: var(--text-secondary); }
+
+.status-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 100px;
+  flex-shrink: 0;
+}
+.st-done     { background: #f0f0ee; color: #888480; }
+.st-upcoming { background: #fff8ec; color: #b07000; }
+.st-progress { background: #eef4ff; color: #2563c4; }
+.st-tbd      { background: #f4f4f4; color: #aaaaaa; }
+
+.card-arrow { color: var(--text-muted); font-size: 18px; flex-shrink: 0; }
+
+/* ─── DETAIL ──────────────────────────── */
+.detail-nav { padding: 16px 20px 0; }
+.back-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.back-btn:hover { color: var(--text-primary); }
+
+.detail-header {
+  padding: 14px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.detail-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+}
+.detail-title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 14px;
+}
+
+/* Progress */
+.progress-wrap { display: flex; align-items: center; gap: 10px; }
+.progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+.progress-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* Sections */
+.detail-body { padding: 24px 20px 0; }
+.section { margin-bottom: 30px; }
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.section-tag {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 100px;
+}
+.tag-warmup { background: var(--tag-warmup-bg); color: var(--tag-warmup); }
+.tag-main   { background: var(--tag-main-bg);   color: var(--tag-main); }
+.tag-core   { background: var(--tag-core-bg);   color: var(--tag-core); }
+.section-line { flex: 1; height: 1px; background: var(--border); }
+
+/* Warmup list */
+.warmup-list {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.warmup-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
+}
+.warmup-row:last-child { border-bottom: none; }
+.warmup-row:hover { background: #fafaf8; }
+.warmup-row.checked { opacity: 0.5; }
+
+.check-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.warmup-row.checked .check-circle,
+.ex-card.checked .check-circle {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.w-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  min-width: 16px;
+  flex-shrink: 0;
+}
+.w-name {
+  font-size: 13px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+}
+.warmup-row.checked .w-name { text-decoration: line-through; color: var(--text-muted); }
+.w-dose {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.w-yt {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.w-yt a {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+.w-yt svg { width: 16px; height: 16px; }
+
+/* Exercise cards */
+.ex-list { display: flex; flex-direction: column; gap: 8px; }
+.ex-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.18s, opacity 0.15s;
+}
+.ex-card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+.ex-card.checked { opacity: 0.5; }
+
+.ex-body {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  cursor: pointer;
+  user-select: none;
+}
+.ex-check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all 0.15s ease;
+}
+.ex-content { flex: 1; min-width: 0; }
+.ex-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 5px;
+}
+.ex-card.checked .ex-name { text-decoration: line-through; color: var(--text-muted); }
+.ex-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-bottom: 9px;
+}
+.ex-dose {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  background: #f2f1ee;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+.ex-video {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px 10px 48px;
+  border-top: 1px solid var(--border);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.ex-video:hover { background: #fafaf8; }
+.ex-video svg { width: 18px; height: 18px; flex-shrink: 0; }
+.yt-label { font-size: 11px; color: var(--yt-red); font-weight: 500; }
+
+/* Footer */
+.pg-footer {
+  margin: 32px 20px 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ══════════════════════════════════════════
+//  ICONS
+// ══════════════════════════════════════════
+const YT_SVG = `<svg viewBox="0 0 24 24" fill="none">
+  <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#e03030"/>
+  <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/>
+</svg>`;
+
+const CHECK_SVG = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+  <path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+// ══════════════════════════════════════════
+//  DATA
+//  To add a new session: push a new object
+//  into SESSIONS following the same shape.
+// ══════════════════════════════════════════
+const SESSIONS = [
+  // ── SESSION 1 ─────────────────────────
+  {
+    id: "upper-2026-06-03",
+    date: "2026-06-03",
+    dateLabel: "03. Jun 2026",
+    time: "Vormittag",
+    title: "Kraft — Upper Body",
+    subtitle: "Warm-up · Main · Core",
+    category: "upper",
+    status: "done",   // "done" | "upcoming" | "tbd"
+    warmup: [
+      { name: "Spine Foam-rolling",          dose: "1 × thoracic spine", yt: "j1V-stq6j0g" },
+      { name: "Cat & Camel",                 dose: "1 × 10",             yt: "oRnp3G_viMQ" },
+      { name: "Quadruped Lateral Flexion",   dose: "1 × 10",             yt: "c-skI1qGbVY" },
+      { name: "Quadruped Thoracic Rotation", dose: "1 × 10",             yt: "Lfn-Fv_xmmQ" },
+      { name: "Prone Y-T-W",                 dose: "1 × 10",             yt: "tlcuHSz1TQE" },
+      { name: "Prone Cobra",                 dose: "1 × 10",             yt: "HdLsIjcx0LM" },
+      { name: "Wall Angel",                  dose: "1 × 10",             yt: "miYvAB8QA3g" },
+      { name: "Scapular Pull-up",            dose: "1 × 10",             yt: "nw-FIMwCkLs"  }
+    ],
+    main: [
+      { name: "Pull-up",                       dose: "3 × 10",           yt: "mTxSi3Vu1Jg",
+        en: "Full range of motion. Control the descent. Avoid swinging.",
+        de: "Volle Bewegungsreichweite. Abstieg kontrollieren. Schwingen vermeiden." },
+      { name: "Chest-supported Row w/ Dumbbell", dose: "3 × 10",         yt: "czoQ_ncuqqI",
+        en: "Chest on the bench. Pull elbows back, squeeze the shoulder blades at the top.",
+        de: "Brust auf der Bank. Ellbogen nach hinten ziehen, Schulterblätter oben zusammendrücken." },
+      { name: "Dumbbell Pullover",             dose: "3 × 10",           yt: "Datv2L6t3-4",
+        en: "Keep a slight bend in the elbows. Lower the weight slowly behind the head.",
+        de: "Leichte Ellbogenbeugung halten. Gewicht langsam hinter den Kopf absenken." },
+      { name: "Face Pull w/ Cable",            dose: "3 × 10",           yt: "IeOqdw9WI90",
+        en: "Pull towards the face at eye level. Externally rotate at the end of the movement.",
+        de: "Auf Augenhöhe zum Gesicht ziehen. Am Bewegungsende nach außen rotieren." },
+      { name: "Plate Pinch Rotation",          dose: "3 × 3 rotations",  yt: "lpBxF4lihQ4",
+        en: "Pinch the plate between fingers and thumb. Slowly rotate the wrist in and out.",
+        de: "Scheibe zwischen Fingern und Daumen klemmen. Handgelenk langsam ein- und auswärts drehen." },
+      { name: "Dumbbell Wrist Flexion Curl",   dose: "3 × 15 per arm",   yt: "M8TpHw5aYgA",
+        en: "Forearm resting on the knee. Curl the wrist up slowly, lower with control.",
+        de: "Unterarm auf dem Knie ablegen. Handgelenk langsam nach oben curlen, kontrolliert absenken." }
+    ],
+    core: [
+      { name: "Reverse Hyper",   dose: "3 × 10", yt: "XrUwdAm95us",
+        en: "Hips at the edge of the bench. Lift legs until parallel to the floor, squeeze glutes at the top.",
+        de: "Hüfte am Bankrand. Beine bis zur Waagerechten heben, Gesäß oben anspannen." },
+      { name: "Hyper Extension", dose: "3 × 10", yt: "8rXdAAwm8Rs",
+        en: "Hip-hinge movement. Lower the torso, then extend back to neutral. Keep the back straight.",
+        de: "Hüftgelenksbewegung. Oberkörper absenken, dann in die Neutralposition zurückstrecken. Rücken gerade halten." }
+    ]
+  },
+
+  // ── SESSION 2 ─────────────────────────
+  {
+    id: "lower-2026-06-05",
+    date: "2026-06-05",
+    dateLabel: "05. Jun 2026",
+    time: "Nachmittag",
+    title: "Kraft — Lower Body",
+    subtitle: "Warm-up · Main · Core",
+    category: "lower",
+    status: "upcoming",
+    warmup: [
+      { name: "90/90 Hip Switch",                            dose: "1 × 10"        },
+      { name: "Seated Hurdle Mobilization",                  dose: "1 × 10"        },
+      { name: "Half Kneeling Hip Flexor Mobilization",       dose: "1 × 10"        },
+      { name: "Half Kneeling Hip Flexor Stretch",            dose: "1 × 30s"       },
+      { name: "Adductor Rockback",                           dose: "1 × 10"        },
+      { name: "Half Kneeling Adductor Stretch",              dose: "1 × 30s"       },
+      { name: "Single Kneeling Hold w/ Closed Eyes on Bosu", dose: "1 × 30s / leg" },
+      { name: "Single Kneeling Trunk Rotation on Bosu",      dose: "1 × 30s / leg" },
+      { name: "Single Kneeling Pallof Press on Bosu",        dose: "1 × 30s"       },
+      { name: "Single Kneeling Ball Catch on Bosu",          dose: "1 × 30s"       }
+    ],
+    main: [
+      { name: "GHD Sit-up",                            dose: "3 × 10",  yt: "Flk08-L5KQc",
+        en: "Secure feet on the GHD, lower the torso back fully then drive up explosively. Trains the entire anterior chain through a full range of motion.",
+        de: "Füße am GHD fixieren, Oberkörper vollständig absenken und explosiv hochkommen. Trainiert die gesamte vordere Kette." },
+      { name: "Cable Crunch",                           dose: "3 × 10",  yt: "K2m0jj6RfYg",
+        en: "Kneel at a cable machine, grip the rope at your head, and crunch the spine downward — hips stay fixed. Constant tension on the abs throughout.",
+        de: "Am Kabelzug knien, Seil am Kopf greifen, Wirbelsäule nach unten crunchen — Hüfte bleibt fixiert. Konstante Spannung auf die Bauchmuskulatur." },
+      { name: "Swiss Ball Rollout",                     dose: "3 × 10",  yt: "Hm10RFuEtCE",
+        en: "Kneel with forearms on a Swiss ball, roll forward extending the hips and spine, then pull back. Anti-extension core exercise demanding full-body tension.",
+        de: "Kniend mit Unterarmen auf dem Pezziball, nach vorne rollen und zurückziehen. Anti-Extensions-Übung mit hoher Ganzkörperspannung." },
+      { name: "Hanging Knee Raise w/ DB",               dose: "3 × 10",  yt: "Y05bN1ToVKc",
+        en: "Hang from a bar gripping a dumbbell between the feet, drive knees up toward the chest. Targets the lower abs and hip flexors under load.",
+        de: "An der Stange hängen, Hantel zwischen den Füßen, Knie zur Brust ziehen. Trainiert die untere Bauchmuskulatur und Hüftbeuger unter Last." },
+      { name: "Tibialis Anterior Raise",               dose: "3 × 20",  yt: "pQcvW08rnAk",
+        en: "Stand against a wall, lift toes up repeatedly. Strengthens the shin muscle for ankle stability and dorsiflexion.",
+        de: "An der Wand stehend, Zehen wiederholt anheben. Stärkt den vorderen Schienbeinmuskel." },
+      { name: "Heel Walk",                             dose: "3 × 10m", yt: "qyF7Jk6puII",
+        en: "Walk on your heels with toes raised off the ground. Improves tibialis anterior strength and ankle control.",
+        de: "Auf den Fersen gehen, Zehen angehoben. Verbessert die Schienbeinkraft und Sprunggelenkskontrolle." },
+      { name: "Ankle Dorsiflexion w/ KB",              dose: "3 × 20",  yt: "gF8Do-Sn1jU",
+        en: "Seated or standing, use a kettlebell to assist ankle dorsiflexion range. Improves ankle mobility for athletic performance.",
+        de: "Mit Kettlebell die Sprunggelenksmobilität verbessern. Wichtig für athletische Leistung." }
+    ],
+    core: [
+      { name: "Short Lever Copenhagen Hip Dips",  dose: "3 × 10 / leg", yt: "I1mAR5LGb7c",
+        en: "Side plank with bent knee on bench, lower and raise the hip. Targets the adductors and lateral core.",
+        de: "Seitstütz mit gebeugtem Knie auf Bank, Hüfte heben und senken. Trainiert Adduktoren und seitlichen Rumpf." },
+      { name: "Copenhagen Plank ISO Long Lever",  dose: "3 × 20s",      yt: "GiPuOQjY5rY",
+        en: "Full side plank with straight leg on bench, hold position. Advanced adductor isometric with long lever arm.",
+        de: "Seitstütz mit gestrecktem Bein auf Bank, Position halten. Fortgeschrittene Adduktoren-Isometrie." },
+      { name: "Side-lying Hip Adduction",         dose: "3 × 20 / leg", yt: "yt6wtJqNr7E",
+        en: "Lie on your side, lift the bottom leg up toward the top leg. Isolates the hip adductors through full range of motion.",
+        de: "Seitlage, unteres Bein nach oben heben. Isoliert die Adduktoren durch den vollen Bewegungsbereich." }
+    ]
+  }
+
+  // ── ADD NEW SESSIONS BELOW ─────────────
+  // Copy the shape above, set status: "upcoming" or "tbd"
+];
+
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+let view = 'home';
+let currentSession = null;
+let activeFilter = 'all';
+
+// ══════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════
+function getChecked(sid) {
+  try { return JSON.parse(localStorage.getItem('stb_' + sid) || '{}'); }
+  catch { return {}; }
+}
+function toggle(sid, key) {
+  const d = getChecked(sid);
+  d[key] = !d[key];
+  localStorage.setItem('stb_' + sid, JSON.stringify(d));
+  return d[key];
+}
+function progress(s) {
+  const ch = getChecked(s.id);
+  const keys = [
+    ...s.warmup.map((_, i) => 'w' + i),
+    ...s.main.map((_, i) => 'm' + i),
+    ...s.core.map((_, i) => 'c' + i)
+  ];
+  return { done: keys.filter(k => ch[k]).length, total: keys.length };
+}
+
+// ══════════════════════════════════════════
+//  RENDER — HOME
+// ══════════════════════════════════════════
+function renderHome() {
+  const cats = ['all', ...new Set(SESSIONS.map(s => s.category))];
+  const catLabel = { all: 'All', upper: 'Upper', lower: 'Lower', sprint: 'Sprint' };
+
+  const pills = cats.map(c =>
+    `<button class="filter-pill${activeFilter === c ? ' active' : ''}" data-filter="${c}">${catLabel[c] || c}</button>`
+  ).join('');
+
+  const list = SESSIONS
+    .filter(s => activeFilter === 'all' || s.category === activeFilter)
+    .reduce((groups, s) => {
+      (groups[s.date] = groups[s.date] || []).push(s);
+      return groups;
+    }, {});
+
+  const rows = Object.entries(list).map(([, sessions]) => {
+    const cards = sessions.map(s => {
+      const { done, total } = progress(s);
+      const clickable = s.status !== 'tbd';
+      const timeCls = s.time === 'Vormittag' ? 'time-vm' : 'time-nm';
+      let stCls = 'st-' + s.status;
+      let stLabel = { done: 'Done', upcoming: 'Upcoming', tbd: 'TBD' }[s.status];
+      if (s.status === 'upcoming' && done > 0 && done < total) {
+        stCls = 'st-progress'; stLabel = 'In Progress';
+      }
+      return `<div class="session-card${clickable ? ' clickable' : ' dim'}${s.status === 'done' ? ' past' : ''}" data-sid="${s.id}">
+        <span class="time-badge ${timeCls}">${s.time}</span>
+        <div class="session-info">
+          <div class="s-title">${s.title}</div>
+          <div class="s-sub">${s.subtitle}</div>
+        </div>
+        <span class="status-badge ${stCls}">${stLabel}</span>
+        ${clickable ? '<span class="card-arrow">›</span>' : ''}
+      </div>`;
+    }).join('');
+    return `<div class="date-group">
+      <div class="date-row">
+        <span class="date-label">${sessions[0].dateLabel}</span>
+        <span class="date-line"></span>
+      </div>
+      ${cards}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="home-header">
+      <div class="home-meta">Skeleton Team Bayern · Trainingsplan</div>
+      <div class="home-title">Trainings-Übersicht</div>
+    </div>
+    <div class="filter-bar">${pills}</div>
+    <div class="sessions-list">${rows}</div>
+    <div class="pg-footer">Skeleton Team Bayern · Externe Trainingseinheiten</div>`;
+}
+
+// ══════════════════════════════════════════
+//  RENDER — SESSION DETAIL
+// ══════════════════════════════════════════
+function renderWarmupRow(ex, i, sid) {
+  const key = 'w' + i;
+  const ch = getChecked(sid)[key];
+  return `<div class="warmup-row${ch ? ' checked' : ''}" data-key="${key}" data-sid="${sid}">
+    <div class="check-circle">${CHECK_SVG}</div>
+    <span class="w-num">${String(i + 1).padStart(2, '0')}</span>
+    <span class="w-name">${ex.name}</span>
+    <span class="w-dose">${ex.dose}</span>
+    ${ex.yt ? `<div class="w-yt"><a href="https://www.youtube.com/shorts/${ex.yt}" target="_blank" rel="noopener" class="yt-stop">${YT_SVG}</a></div>` : ''}
+  </div>`;
+}
+
+function renderExCard(ex, prefix, i, sid) {
+  const key = prefix + i;
+  const ch = getChecked(sid)[key];
+  return `<div class="ex-card${ch ? ' checked' : ''}">
+    <div class="ex-body" data-key="${key}" data-sid="${sid}">
+      <div class="ex-check check-circle">${CHECK_SVG}</div>
+      <div class="ex-content">
+        <div class="ex-name">${ex.name}</div>
+        ${ex.en ? `<div class="ex-desc">${ex.en}<br><em>${ex.de}</em></div>` : ''}
+        <span class="ex-dose">${ex.dose}</span>
+      </div>
+    </div>
+    ${ex.yt ? `<a class="ex-video" href="https://www.youtube.com/shorts/${ex.yt}" target="_blank" rel="noopener">${YT_SVG}<span class="yt-label">Watch on YouTube</span></a>` : ''}
+  </div>`;
+}
+
+function renderDetail(s) {
+  const { done, total } = progress(s);
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const timeCls = s.time === 'Vormittag' ? 'time-vm' : 'time-nm';
+
+  return `
+    <div class="detail-nav">
+      <button class="back-btn" id="backBtn">← Zurück</button>
+    </div>
+    <div class="detail-header">
+      <div class="detail-meta">
+        <span class="time-badge ${timeCls}">${s.time}</span>
+        <span class="detail-date">${s.dateLabel}</span>
+      </div>
+      <div class="detail-title">${s.title}</div>
+      <div class="progress-wrap">
+        <div class="progress-track"><div class="progress-fill" id="pFill" style="width:${pct}%"></div></div>
+        <span class="progress-text" id="pText">${done} / ${total}</span>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="section">
+        <div class="section-label"><span class="section-tag tag-warmup">Warm-up</span><span class="section-line"></span></div>
+        <div class="warmup-list">${s.warmup.map((e, i) => renderWarmupRow(e, i, s.id)).join('')}</div>
+      </div>
+      <div class="section">
+        <div class="section-label"><span class="section-tag tag-main">Main Exercises</span><span class="section-line"></span></div>
+        <div class="ex-list">${s.main.map((e, i) => renderExCard(e, 'm', i, s.id)).join('')}</div>
+      </div>
+      <div class="section">
+        <div class="section-label"><span class="section-tag tag-core">Core</span><span class="section-line"></span></div>
+        <div class="ex-list">${s.core.map((e, i) => renderExCard(e, 'c', i, s.id)).join('')}</div>
+      </div>
+    </div>
+    <div class="pg-footer">Skeleton Team Bayern · ${s.title}</div>`;
+}
+
+// ══════════════════════════════════════════
+//  PROGRESS UPDATE (no re-render)
+// ══════════════════════════════════════════
+function refreshProgress(s) {
+  const { done, total } = progress(s);
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const fill = document.getElementById('pFill');
+  const text = document.getElementById('pText');
+  if (fill) fill.style.width = pct + '%';
+  if (text) text.textContent = done + ' / ' + total;
+}
+
+// ══════════════════════════════════════════
+//  MAIN RENDER
+// ══════════════════════════════════════════
+function render() {
+  document.getElementById('app').innerHTML =
+    view === 'session' && currentSession
+      ? renderDetail(currentSession)
+      : renderHome();
+}
+
+// ══════════════════════════════════════════
+//  EVENT DELEGATION (attached once)
+// ══════════════════════════════════════════
+document.getElementById('app').addEventListener('click', e => {
+  // YouTube links — never toggle
+  if (e.target.closest('a')) return;
+
+  // Back button
+  if (e.target.closest('#backBtn')) {
+    view = 'home';
+    render();
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  // Filter pills
+  const pill = e.target.closest('.filter-pill');
+  if (pill) {
+    activeFilter = pill.dataset.filter;
+    render();
+    return;
+  }
+
+  // Session card (home)
+  const card = e.target.closest('.session-card.clickable');
+  if (card && view === 'home') {
+    currentSession = SESSIONS.find(s => s.id === card.dataset.sid);
+    if (currentSession) { view = 'session'; render(); window.scrollTo(0, 0); }
+    return;
+  }
+
+  // Warmup row toggle
+  const wRow = e.target.closest('.warmup-row');
+  if (wRow) {
+    const sid = wRow.dataset.sid, key = wRow.dataset.key;
+    const checked = toggle(sid, key);
+    wRow.classList.toggle('checked', checked);
+    refreshProgress(SESSIONS.find(s => s.id === sid));
+    return;
+  }
+
+  // Exercise body toggle
+  const exBody = e.target.closest('.ex-body');
+  if (exBody) {
+    const sid = exBody.dataset.sid, key = exBody.dataset.key;
+    const checked = toggle(sid, key);
+    exBody.closest('.ex-card').classList.toggle('checked', checked);
+    refreshProgress(SESSIONS.find(s => s.id === sid));
+    return;
+  }
+});
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
