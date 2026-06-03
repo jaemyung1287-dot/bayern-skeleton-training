@@ -345,27 +345,28 @@ body {
   transition: all 0.15s ease;
 }
 .ex-content { flex: 1; min-width: 0; }
+.ex-name-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 5px;
+}
 .ex-name {
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin-bottom: 5px;
 }
-.ex-card.checked .ex-name { text-decoration: line-through; color: var(--text-muted); }
+.ex-dose {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
 .ex-desc {
   font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.55;
-  margin-bottom: 9px;
-}
-.ex-dose {
-  display: inline-block;
-  font-family: 'DM Mono', monospace;
-  font-size: 10px;
-  color: var(--accent);
-  background: #f2f1ee;
-  padding: 3px 8px;
-  border-radius: 5px;
 }
 .ex-video {
   display: flex;
@@ -467,8 +468,8 @@ const SESSIONS = [
   // ── SESSION 2 ─────────────────────────
   {
     id: "lower-2026-06-05",
-    date: "2026-06-05",
-    dateLabel: "05. Jun 2026",
+    date: "2026-06-04",
+    dateLabel: "04. Jun 2026",
     time: "Nachmittag",
     title: "Kraft — Lower Body",
     subtitle: "Warm-up · Main · Core",
@@ -483,7 +484,6 @@ const SESSIONS = [
       { name: "Half Kneeling Adductor Stretch",              dose: "1 × 30s"       },
       { name: "Single Kneeling Hold w/ Closed Eyes on Bosu", dose: "1 × 30s / leg" },
       { name: "Single Kneeling Trunk Rotation on Bosu",      dose: "1 × 30s / leg" },
-      { name: "Single Kneeling Pallof Press on Bosu",        dose: "1 × 30s"       },
       { name: "Single Kneeling Ball Catch on Bosu",          dose: "1 × 30s"       }
     ],
     main: [
@@ -533,28 +533,6 @@ let view = 'home';
 let currentSession = null;
 let activeFilter = 'all';
 
-// ══════════════════════════════════════════
-//  STORAGE
-// ══════════════════════════════════════════
-function getChecked(sid) {
-  try { return JSON.parse(localStorage.getItem('stb_' + sid) || '{}'); }
-  catch { return {}; }
-}
-function toggle(sid, key) {
-  const d = getChecked(sid);
-  d[key] = !d[key];
-  localStorage.setItem('stb_' + sid, JSON.stringify(d));
-  return d[key];
-}
-function progress(s) {
-  const ch = getChecked(s.id);
-  const keys = [
-    ...s.warmup.map((_, i) => 'w' + i),
-    ...s.main.map((_, i) => 'm' + i),
-    ...s.core.map((_, i) => 'c' + i)
-  ];
-  return { done: keys.filter(k => ch[k]).length, total: keys.length };
-}
 
 // ══════════════════════════════════════════
 //  RENDER — HOME
@@ -576,14 +554,10 @@ function renderHome() {
 
   const rows = Object.entries(list).map(([, sessions]) => {
     const cards = sessions.map(s => {
-      const { done, total } = progress(s);
       const clickable = s.status !== 'tbd';
       const timeCls = s.time === 'Vormittag' ? 'time-vm' : 'time-nm';
-      let stCls = 'st-' + s.status;
-      let stLabel = { done: 'Done', upcoming: 'Upcoming', tbd: 'TBD' }[s.status];
-      if (s.status === 'upcoming' && done > 0 && done < total) {
-        stCls = 'st-progress'; stLabel = 'In Progress';
-      }
+      const stCls = 'st-' + s.status;
+      const stLabel = { done: 'Done', upcoming: 'Upcoming', tbd: 'TBD' }[s.status];
       return `<div class="session-card${clickable ? ' clickable' : ' dim'}${s.status === 'done' ? ' past' : ''}" data-sid="${s.id}">
         <span class="time-badge ${timeCls}">${s.time}</span>
         <div class="session-info">
@@ -616,28 +590,24 @@ function renderHome() {
 // ══════════════════════════════════════════
 //  RENDER — SESSION DETAIL
 // ══════════════════════════════════════════
-function renderWarmupRow(ex, i, sid) {
-  const key = 'w' + i;
-  const ch = getChecked(sid)[key];
-  return `<div class="warmup-row${ch ? ' checked' : ''}" data-key="${key}" data-sid="${sid}">
-    <div class="check-circle">${CHECK_SVG}</div>
+function renderWarmupRow(ex, i) {
+  return `<div class="warmup-row">
     <span class="w-num">${String(i + 1).padStart(2, '0')}</span>
     <span class="w-name">${ex.name}</span>
     <span class="w-dose">${ex.dose}</span>
-    ${ex.yt ? `<div class="w-yt"><a href="https://www.youtube.com/shorts/${ex.yt}" target="_blank" rel="noopener" class="yt-stop">${YT_SVG}</a></div>` : ''}
+    ${ex.yt ? `<div class="w-yt"><a href="https://www.youtube.com/shorts/${ex.yt}" target="_blank" rel="noopener">${YT_SVG}</a></div>` : ''}
   </div>`;
 }
 
-function renderExCard(ex, prefix, i, sid) {
-  const key = prefix + i;
-  const ch = getChecked(sid)[key];
-  return `<div class="ex-card${ch ? ' checked' : ''}">
-    <div class="ex-body" data-key="${key}" data-sid="${sid}">
-      <div class="ex-check check-circle">${CHECK_SVG}</div>
+function renderExCard(ex) {
+  return `<div class="ex-card">
+    <div class="ex-body">
       <div class="ex-content">
-        <div class="ex-name">${ex.name}</div>
+        <div class="ex-name-row">
+          <span class="ex-name">${ex.name}</span>
+          <span class="ex-dose">${ex.dose}</span>
+        </div>
         ${ex.en ? `<div class="ex-desc">${ex.en}<br><em>${ex.de}</em></div>` : ''}
-        <span class="ex-dose">${ex.dose}</span>
       </div>
     </div>
     ${ex.yt ? `<a class="ex-video" href="https://www.youtube.com/shorts/${ex.yt}" target="_blank" rel="noopener">${YT_SVG}<span class="yt-label">Watch on YouTube</span></a>` : ''}
@@ -645,8 +615,6 @@ function renderExCard(ex, prefix, i, sid) {
 }
 
 function renderDetail(s) {
-  const { done, total } = progress(s);
-  const pct = total ? Math.round(done / total * 100) : 0;
   const timeCls = s.time === 'Vormittag' ? 'time-vm' : 'time-nm';
 
   return `
@@ -659,39 +627,24 @@ function renderDetail(s) {
         <span class="detail-date">${s.dateLabel}</span>
       </div>
       <div class="detail-title">${s.title}</div>
-      <div class="progress-wrap">
-        <div class="progress-track"><div class="progress-fill" id="pFill" style="width:${pct}%"></div></div>
-        <span class="progress-text" id="pText">${done} / ${total}</span>
-      </div>
     </div>
     <div class="detail-body">
       <div class="section">
         <div class="section-label"><span class="section-tag tag-warmup">Warm-up</span><span class="section-line"></span></div>
-        <div class="warmup-list">${s.warmup.map((e, i) => renderWarmupRow(e, i, s.id)).join('')}</div>
+        <div class="warmup-list">${s.warmup.map((e, i) => renderWarmupRow(e, i)).join('')}</div>
       </div>
       <div class="section">
         <div class="section-label"><span class="section-tag tag-main">Main Exercises</span><span class="section-line"></span></div>
-        <div class="ex-list">${s.main.map((e, i) => renderExCard(e, 'm', i, s.id)).join('')}</div>
+        <div class="ex-list">${s.main.map(e => renderExCard(e)).join('')}</div>
       </div>
       <div class="section">
         <div class="section-label"><span class="section-tag tag-core">Core</span><span class="section-line"></span></div>
-        <div class="ex-list">${s.core.map((e, i) => renderExCard(e, 'c', i, s.id)).join('')}</div>
+        <div class="ex-list">${s.core.map(e => renderExCard(e)).join('')}</div>
       </div>
     </div>
     <div class="pg-footer">Skeleton Team Bayern · ${s.title}</div>`;
 }
 
-// ══════════════════════════════════════════
-//  PROGRESS UPDATE (no re-render)
-// ══════════════════════════════════════════
-function refreshProgress(s) {
-  const { done, total } = progress(s);
-  const pct = total ? Math.round(done / total * 100) : 0;
-  const fill = document.getElementById('pFill');
-  const text = document.getElementById('pText');
-  if (fill) fill.style.width = pct + '%';
-  if (text) text.textContent = done + ' / ' + total;
-}
 
 // ══════════════════════════════════════════
 //  MAIN RENDER
@@ -734,25 +687,6 @@ document.getElementById('app').addEventListener('click', e => {
     return;
   }
 
-  // Warmup row toggle
-  const wRow = e.target.closest('.warmup-row');
-  if (wRow) {
-    const sid = wRow.dataset.sid, key = wRow.dataset.key;
-    const checked = toggle(sid, key);
-    wRow.classList.toggle('checked', checked);
-    refreshProgress(SESSIONS.find(s => s.id === sid));
-    return;
-  }
-
-  // Exercise body toggle
-  const exBody = e.target.closest('.ex-body');
-  if (exBody) {
-    const sid = exBody.dataset.sid, key = exBody.dataset.key;
-    const checked = toggle(sid, key);
-    exBody.closest('.ex-card').classList.toggle('checked', checked);
-    refreshProgress(SESSIONS.find(s => s.id === sid));
-    return;
-  }
 });
 
 // ══════════════════════════════════════════
