@@ -368,6 +368,24 @@ body {
   color: var(--text-secondary);
   line-height: 1.55;
 }
+.ex-spec { margin-top: 4px; }
+.spec-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+.spec-row:last-child { border-bottom: none; }
+.spec-k { font-size: 12.5px; color: var(--text-secondary); }
+.spec-v {
+  font-family: 'DM Mono', monospace;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
 .ex-video {
   display: flex;
   align-items: center;
@@ -549,8 +567,13 @@ const SESSIONS = [
     ],
     main: [
       { name: "Cycling Sprint Block",  dose: "3 sets × 3 reps",
-        en: "ATP-PC system, seat height elevated. 8s all-out sprint at 90% intensity, 2 min rest between reps. 7 min rest between the 3 sets. Total work ~72s, full session ~35 min.",
-        de: "ATP-PC-System, Sattelhöhe erhöht. 8s All-out-Sprint bei 90% Intensität, 2 min Pause zwischen den Wiederholungen. 7 min Pause zwischen den 3 Sätzen. Gesamtarbeitszeit ~72s, gesamte Einheit ~35 min." }
+        spec: [
+          { k: "Sprint",            v: "8 s @ 90%" },
+          { k: "Rest between reps", v: "2 min" },
+          { k: "Rest between sets", v: "7 min" },
+          { k: "Seat height",       v: "elevated" },
+          { k: "Total",             v: "~72 s work · ~35 min" }
+        ] }
     ],
     core: []
   }
@@ -638,9 +661,10 @@ function renderExCard(ex) {
       <div class="ex-content">
         <div class="ex-name-row">
           <span class="ex-name">${ex.name}</span>
-          <span class="ex-dose">${ex.dose}</span>
+          ${ex.dose ? `<span class="ex-dose">${ex.dose}</span>` : ''}
         </div>
-        ${ex.en ? `<div class="ex-desc">${ex.en}<br><em>${ex.de}</em></div>` : ''}
+        ${ex.spec ? `<div class="ex-spec">${ex.spec.map(s => `<div class="spec-row"><span class="spec-k">${s.k}</span><span class="spec-v">${s.v}</span></div>`).join('')}</div>` : ''}
+        ${ex.en ? `<div class="ex-desc">${ex.en}${ex.de ? `<br><em>${ex.de}</em>` : ''}</div>` : ''}
       </div>
     </div>
     ${ex.yt ? `<a class="ex-video" href="https://www.youtube.com/shorts/${ex.yt}" target="_blank" rel="noopener">${YT_SVG}<span class="yt-label">Watch on YouTube</span></a>` : ''}
