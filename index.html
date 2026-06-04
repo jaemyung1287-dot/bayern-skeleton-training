@@ -520,6 +520,39 @@ const SESSIONS = [
         en: "Lie on your side, lift the bottom leg up toward the top leg. Isolates the hip adductors through full range of motion.",
         de: "Seitlage, unteres Bein nach oben heben. Isoliert die Adduktoren durch den vollen Bewegungsbereich." }
     ]
+  },
+
+  // ── SESSION 3 ─────────────────────────
+  {
+    id: "sprint-2026-06-06",
+    date: "2026-06-06",
+    dateLabel: "06. Jun 2026",
+    time: "Vormittag",
+    title: "Sprint — Cycling ATP-PC",
+    subtitle: "Warm-up · Activation · Sprint Block",
+    category: "sprint",
+    status: "upcoming",
+    warmup: [
+      { name: "Foam-rolling — Spine",        dose: "Foam roll"        },
+      { name: "Foam-rolling — Hip Flexor",   dose: "Foam roll"        },
+      { name: "Foam-rolling — Hamstring",    dose: "Foam roll"        },
+      { name: "Foam-rolling — Calf",         dose: "Foam roll"        },
+      { name: "Personal Mobility",           dose: "Individuell"      },
+      { name: "Cycling",                     dose: "10 min"           },
+      { name: "Dynamic Warm-up",             dose: "1 set"            },
+      { name: "90/90 IAP Breathing",         dose: "2 × 10"           },
+      { name: "Bird Dog",                    dose: "1 × 5",           yt: "vtwhC3tfVow" },
+      { name: "Single Leg Glute Bridge",     dose: "1 × 10",          yt: "V1NKta2znwU" },
+      { name: "Supine Hamstring Walkouts",   dose: "3 × 3 steps × 5", yt: "EpkA04674XQ" },
+      { name: "Single Leg Eccentric Curl",   dose: "3 × 10",          yt: "SLRv1VZIpQs" },
+      { name: "Supine Swiss Ball Kick Curl", dose: "3 × 10",          yt: "uO78m4M7Yh4" }
+    ],
+    main: [
+      { name: "Cycling Sprint Block",  dose: "3 sets × 3 reps",
+        en: "ATP-PC system, seat height elevated. 8s all-out sprint at 90% intensity, 2 min rest between reps. 7 min rest between the 3 sets. Total work ~72s, full session ~35 min.",
+        de: "ATP-PC-System, Sattelhöhe erhöht. 8s All-out-Sprint bei 90% Intensität, 2 min Pause zwischen den Wiederholungen. 7 min Pause zwischen den 3 Sätzen. Gesamtarbeitszeit ~72s, gesamte Einheit ~35 min." }
+    ],
+    core: []
   }
 
   // ── ADD NEW SESSIONS BELOW ─────────────
@@ -629,18 +662,18 @@ function renderDetail(s) {
       <div class="detail-title">${s.title}</div>
     </div>
     <div class="detail-body">
-      <div class="section">
+      ${(s.warmup && s.warmup.length) ? `<div class="section">
         <div class="section-label"><span class="section-tag tag-warmup">Warm-up</span><span class="section-line"></span></div>
         <div class="warmup-list">${s.warmup.map((e, i) => renderWarmupRow(e, i)).join('')}</div>
-      </div>
-      <div class="section">
+      </div>` : ''}
+      ${(s.main && s.main.length) ? `<div class="section">
         <div class="section-label"><span class="section-tag tag-main">Main Exercises</span><span class="section-line"></span></div>
         <div class="ex-list">${s.main.map(e => renderExCard(e)).join('')}</div>
-      </div>
-      <div class="section">
+      </div>` : ''}
+      ${(s.core && s.core.length) ? `<div class="section">
         <div class="section-label"><span class="section-tag tag-core">Core</span><span class="section-line"></span></div>
         <div class="ex-list">${s.core.map(e => renderExCard(e)).join('')}</div>
-      </div>
+      </div>` : ''}
     </div>
     <div class="pg-footer">Skeleton Team Bayern · ${s.title}</div>`;
 }
